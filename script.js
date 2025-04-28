@@ -71,7 +71,7 @@ async function loadCalendar(yearOverride = null) {
     }
 
     const encoded = encodeURIComponent(localDateTime);
-    const url = `http://www.astroapi.somee.com/api/calender/numeroobjectslav?dateTime=${encoded}`;
+    const url = `/api/calender/numeroobjectslav?dateTime=${encoded}`;
 
     try {
         const response = await fetch(url);
@@ -235,7 +235,7 @@ function renderDayInfo(data, dayOfWeekIndex = null) {
 
 // Загрузка информации о дне по клику
 async function fetchDayInfo(day, month) {
-    const url = `http://www.astroapi.somee.com/api/calender/holidayobjectslav?day=${day}&month=${month}`;
+    const url = `/api/calender/holidayobjectslav?day=${day}&month=${month}`;
     try {
         const response = await fetch(url);
         const data = await response.json();
