@@ -2,362 +2,55 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Коляды Дар</title>
+    <title>Коляды Даръ</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: sans-serif;
-            margin: 10px;
-            padding: 0;
-        }
 
-        h1 {
-            text-align: center;
-            padding-bottom: 0;
-            margin-bottom: 50;
-        }
+    <!-- SEO -->
+    <meta name="description" content="Коляды Даръ — Древний Славяно-Арийский Календарь, на любое Лѣто. Праздники, посты и др.">
+    <meta name="keywords" content="Коляды Дар,Коляды Даръ,древний,арии, каляды, славянский,арийский, славяно-арийский, календарь, славяне, ингляне, инглинги, жреческий, звездный, праздники, славянские, посты, культура, лето, лѣто">
+    <meta name="author" content="Volodymyr Serhiienko">
 
-        h2 {
-            text-align: center;
-            padding: 0;
-            margin: 0;
-        }
+    <!-- Open Graph (для соцсетей) -->
+    <meta property="og:title" content="Коляды Даръ — Древний Славяно-Арийский Календарь">
+    <meta property="og:description" content="Коляды Даръ — Древний Славяно-Арийский Календарь, на любое Лѣто. Праздники, посты и др.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://koladydar.vercel.app/">
 
-        h3 {
-            padding: 0;
-            margin: 0;
-        }
+    <!-- Favicon -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
 
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 5px;
-        }
-
-        @media (max-width: 900px) {
-            .calendar-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 600px) {
-            .calendar-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .month {
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            background-color: #fafafa;
-        }
-
-        .month-name {
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 16px;
-            font-size: 1.1em;
-        }
-
-        .weekdays,
-        .days {
-            display: grid;
-            grid-template-columns: repeat(9, 1fr);
-            gap: 2px;
-            text-align: center;
-        }
-
-        .weekday,
-        .day {
-            aspect-ratio: 1 / 1;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-            background-color: #fff;
-        }
-
-        .weekday {
-            font-weight: bold;
-            background-color: transparent;
-            border: none;
-            cursor: default;
-            pointer-events: none;
-        }
-
-        .empty-day {
-            background-color: transparent;
-            border: none;
-            cursor: default;
-            pointer-events: none;
-        }
-        
-        .day {
-            cursor: pointer;
-        }
-
-        .today {
-            background-color: lightgreen !important;
-            font-weight: bold;
-            border: 2px solid #4caf50;
-        }
-
-        .holiday {
-            background-color: #fff8c6;
-            border: 1px solid #e0c97f;
-        }
-
-        #result {
-            margin-top: 10px;
-            font-size: 14px;
-            padding: 12px;
-            border-top: 1px solid #ccc;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        @media (max-width: 600px) {
-            .weekday,
-            .day {
-                font-size: 11px;
-                padding: 5px;
-            }
-        }
-
-        /* Дизайн стрелок в хедере */
-
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .header button {
-            font-size: 1.5em;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 5px 10px;
-            user-select: none;
-            transition: transform 0.2s ease;
-        }
-
-        .header button:hover {
-            transform: scale(1.2);
-        }
-
-    </style>
+    <!-- Подключение CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Коляды Дар</h1>
-    <div class="header">
-        <button id="prevYear">&#8592;</button>
-        <h2 id="title"></h2>
-        <button id="nextYear">&#8594;</button>
+    <!-- Закрепленная верхняя панель -->
+    <div class="topbar">
+        <h1>Коляды Даръ</h1>
+        <div class="header">
+            <button id="prevYear">&#8592;</button>
+            <h2 id="title"></h2>
+            <button id="nextYear">&#8594;</button>
+        </div>
     </div>
+
+    <!-- Календарь -->
     <div class="calendar-grid" id="calendar"></div>
+
+    <!-- Блок для информации о дне -->
     <div id="result"></div>
 
-    <script>
-        const monthNames = ["Рамхатъ", "Айлѣтъ", "Бейлѣтъ", "Гэйлѣтъ", "Дайлѣтъ", "Ѥлѣтъ", "Вейлѣтъ", "Хейлѣтъ", "Тайлѣтъ"];
-        const weekDays = ["пн", "вт", "тр", "чт", "пт", "шт", "см", "ос", "нд"];
-        const fullWeekNames = ["Понедельникъ", "Вторникъ", "Тритейникъ", "Четверикъ", "Пятница", "Шестица", "Седьмица", "Осьмица", "Неделя"];
-        const holidays = {
-            1: [1, 4, 6, 9, 11, 14, 16, 19, 22, 24, 27, 31, 36, 38, 40],
-            2: [2, 4, 7, 12, 13, 16, 19, 22, 25, 29, 32, 36],
-            3: [1, 4, 7, 13, 18, 20, 22, 29, 33, 38],
-            4: [2, 7, 12, 17, 22, 33, 37, 40],
-            5: [2, 5, 6, 14, 17, 19, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 40],
-            6: [4, 11, 13, 16, 19, 22, 26, 29, 33, 37, 40],
-            7: [5, 9, 12, 14, 18, 22, 25, 27, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41],
-            8: [1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 17, 18, 21, 22, 27, 30, 33, 34, 35, 38, 40],
-            9: [3, 6, 9, 12, 16, 18, 21, 22, 24, 27, 29, 31, 33, 35, 38, 41]
-        };
-        let isInitialLoad = true;
-        let yearOffset = 0;
-        const realNow = new Date(); // сохраняем начальную дату при загрузке
+    <!-- Футер -->
+    <footer class="footer">
+        <p>
+            © Лѣто 7533 от СМЗХ. 
+            <span id="devName" class="developer">Связь с разработчиком сайта</span>
+        </p>
+        <div id="contactInfo" class="contact-info" style="display: none;">
+            <p>Сергієнко Владимѣръ. Email: <a href="mailto:utos.vovik@gmail.com">utos.vovik@gmail.com</a></p>
+        </div>
+    </footer>
 
-        async function loadCalendar(yearOverride = null) {
-            let localDateTime;
-
-            if (yearOffset === 0) {
-                const now = new Date();
-                localDateTime = now.getFullYear() + "-" +
-                    String(now.getMonth() + 1).padStart(2, '0') + "-" +
-                    String(now.getDate()).padStart(2, '0') + "T" +
-                    String(now.getHours()).padStart(2, '0') + ":" +
-                    String(now.getMinutes()).padStart(2, '0') + ":" +
-                    String(now.getSeconds()).padStart(2, '0');
-            } else {
-                // Заглушка: фиксированная дата для указанного года
-                localDateTime = `${yearOverride}-07-01T12:00:00`;
-            }
-
-            const encoded = encodeURIComponent(localDateTime);
-            const url = `/api/calender/numeroobjectslav?dateTime=${encoded}`;
-
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-
-                document.getElementById("title").innerText = `Лѣто ${data.year} от СМЗХ`;
-
-                renderCalendar(data);
-
-                if (isInitialLoad || yearOffset === 0) {
-                    renderDayInfo(data);
-                } else {
-                    document.getElementById("result").innerHTML = "";
-                }
-
-                isInitialLoad = false;
-            } catch (err) {
-                document.getElementById("calendar").innerText = "Ошибка загрузки.";
-                console.error(err);
-            }
-        }
-
-        // Отрисовка календаря
-        function renderCalendar(todaySlav) {
-            const container = document.getElementById("calendar");
-            container.innerHTML = "";
-
-            const currentMonth = todaySlav.month;
-            const currentDay = todaySlav.day;
-            const year16 = todaySlav.year16;
-            const todayDayName = todaySlav.dayName;
-
-            // Генерируем длины месяцев
-            const monthLengths = Array.from({ length: 9 }, (_, i) => {
-                const monthNum = i + 1;
-                return (year16 === 16) ? 41 : (monthNum % 2 === 0 ? 40 : 41);
-            });
-
-            // Считаем общее количество прошедших дней с начала года до сегодняшнего дня
-            let passedDays = monthLengths.slice(0, currentMonth - 1).reduce((a, b) => a + b, 0) + currentDay;
-
-            // Определяем индекс дня недели для первого дня года
-            const todayIndex = fullWeekNames.indexOf(todayDayName);
-            const startWeekDayIndex = (todayIndex - ((passedDays - 1) % 9) + 9) % 9;
-
-            // Предварительно считаем количество прошедших дней до каждого месяца
-            const passedDaysPerMonth = [];
-            let total = 0;
-            for (let i = 0; i < 9; i++) {
-                passedDaysPerMonth.push(total);
-                total += monthLengths[i];
-            }
-
-            for (let m = 0; m < 9; m++) {
-                const monthDiv = document.createElement("div");
-                monthDiv.className = "month";
-
-                const title = document.createElement("div");
-                title.className = "month-name";
-                title.innerText = monthNames[m];
-                monthDiv.appendChild(title);
-
-                const weekdays = document.createElement("div");
-                weekdays.className = "weekdays";
-                for (let w of weekDays) {
-                    const wd = document.createElement("div");
-                    wd.className = "weekday";
-                    wd.innerText = w;
-                    weekdays.appendChild(wd);
-                }
-                monthDiv.appendChild(weekdays);
-
-                const days = document.createElement("div");
-                days.className = "days";
-
-                const totalDays = monthLengths[m];
-                const offset = (startWeekDayIndex + passedDaysPerMonth[m]) % 9;
-
-                // Добавляем пустые ячейки в начале месяца
-                for (let i = 0; i < offset; i++) {
-                    const empty = document.createElement("div");
-                    empty.className = "day empty-day";
-                    empty.innerText = "";
-                    days.appendChild(empty);
-                }
-
-                // Рисуем дни месяца
-                for (let d = 1; d <= totalDays; d++) {
-                    const day = document.createElement("div");
-                    day.className = "day";
-                    day.innerText = d;
-
-                    day.dataset.day = d;
-                    day.dataset.month = m + 1;
-
-                    if (holidays[m + 1]?.includes(d)) {
-                        day.classList.add("holiday");
-                    }
-
-                    if ((m + 1) === currentMonth && d === currentDay) {
-                        day.classList.add("today");
-                    }
-
-                    day.addEventListener("click", () => {
-                        fetchDayInfo(d, m + 1);
-                    });
-
-                    days.appendChild(day);
-                }
-
-                monthDiv.appendChild(days);
-                container.appendChild(monthDiv);
-            }
-        }
-
-        // Отображение информации дня
-        function renderDayInfo(data) {
-            const info = `
-                <h3>Информация дня:</h3><br>
-                ${data.нoliday ? `<strong>Праздник:</strong> ${data.нoliday}<br>` : ""}
-                ${data.holiday ? `<strong>Праздник:</strong> ${data.holiday}<br>` : ""}
-                    ${data.postName ? `<strong>${data.postName}</strong><br>` : ""}
-                    ${data.postDescription ? `<em>${data.postDescription}</em>` : ""}
-                `;
-            document.getElementById("result").innerHTML = info;
-        }
-
-        // Обработка клика дня календаря
-        async function fetchDayInfo(day, month) {
-            const url = `/api/calender/holidayobjectslav?day=${day}&month=${month}`;
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                renderDayInfo(data);
-            } catch (err) {
-                document.getElementById("result").innerText = "Ошибка при загрузке информации о дне.";
-                console.error(err);
-            }
-        }
-
-        // Обработка нажатия стрелок переключения года
-        document.getElementById("prevYear").addEventListener("click", () => {
-            yearOffset--;
-            loadCalendar(realNow.getFullYear() + yearOffset);
-        });
-        document.getElementById("nextYear").addEventListener("click", () => {
-            yearOffset++;
-            loadCalendar(realNow.getFullYear() + yearOffset);
-        });
-
-        loadCalendar();
-    </script>
+    <!-- Подключение JS -->
+    <script src="script.js" defer></script>
 </body>
 </html>
