@@ -59,8 +59,14 @@ async function loadCalendar(yearOverride = null) {
 
     if (yearOffset === 0) {
         const now = new Date();
-        localDateTime = now.toISOString();
+        localDateTime = now.getFullYear() + "-" +
+            String(now.getMonth() + 1).padStart(2, '0') + "-" +
+            String(now.getDate()).padStart(2, '0') + "T" +
+            String(now.getHours()).padStart(2, '0') + ":" +
+            String(now.getMinutes()).padStart(2, '0') + ":" +
+            String(now.getSeconds()).padStart(2, '0');
     } else {
+        // Заглушка: фиксированная дата для указанного года
         localDateTime = `${yearOverride}-07-01T12:00:00`;
     }
 
@@ -93,62 +99,110 @@ function renderCalendar(todaySlav) {
     const container = document.getElementById("calendar");
     container.innerHTML = "";
 
-    const { month: currentMonth, day: currentDay, year16, dayName: todayDayName } = todaySlav;
+    const currentMonth = todaySlav.month;
+    const currentDay = todaySlav.day;
+    const year16 = todaySlav.year16;
     currentYear16 = year16;
+    const todayDayName = todaySlav.dayName;
 
-    const monthLengths = Array.from({ length: 9 }, (_, i) => (year16 === 16 ? 41 : (i + 1) % 2 === 0 ? 40 : 41));
-    const passedDays = monthLengths.slice(0, currentMonth - 1).reduce((a, b) => a + b, 0) + currentDay;
+    // Генерируем длины месяцев
+    const monthLengths = Array.from({ length: 9 }, (_, i) => {
+        const monthNum = i + 1;
+        return (year16 === 16) ? 41 : (monthNum % 2 === 0 ? 40 : 41);
+    });
+
+    // Считаем общее количество прошедших дней с начала года до сегодняшнего дня
+    let passedDays = monthLengths.slice(0, currentMonth - 1).reduce((a, b) => a + b, 0) + currentDay;
+
+    // Определяем индекс дня недели для первого дня года
     const todayIndex = fullWeekNames.indexOf(todayDayName);
     const startWeekDayIndex = (todayIndex - ((passedDays - 1) % 9) + 9) % 9;
     startWeekDayIndexGlobal = startWeekDayIndex;
 
-    const passedDaysPerMonth = monthLengths.reduce((acc, len) => {
-        acc.push((acc.length ? acc[acc.length - 1] : 0) + len);
-        return acc;
-    }, [0]).slice(0, 9);
+    // Предварительно считаем количество прошедших дней до каждого месяца
+    const passedDaysPerMonth = [];
+    let total = 0;
+    for (let i = 0; i < 9; i++) {
+        passedDaysPerMonth.push(total);
+        total += monthLengths[i];
+    }
 
     for (let m = 0; m < 9; m++) {
         const monthDiv = document.createElement("div");
         monthDiv.className = "month";
 
-        monthDiv.innerHTML = `
-            <div class="month-name">${monthNames[m]}</div>
-            <div class="weekdays">${weekDays.map(day => `<div class="weekday">${day}</div>`).join('')}</div>
-            <div class="days"></div>
-        `;
+        const title = document.createElement("div");
+        title.className = "month-name";
+        title.innerText = monthNames[m];
+        monthDiv.appendChild(title);
 
-        const daysContainer = monthDiv.querySelector('.days');
+        const weekdays = document.createElement("div");
+        weekdays.className = "weekdays";
+        for (let w of weekDays) {
+            const wd = document.createElement("div");
+            wd.className = "weekday";
+            wd.innerText = w;
+            weekdays.appendChild(wd);
+        }
+        monthDiv.appendChild(weekdays);
+
+        const days = document.createElement("div");
+        days.className = "days";
+
+        const totalDays = monthLengths[m];
         const offset = (startWeekDayIndex + passedDaysPerMonth[m]) % 9;
 
+        // Добавляем пустые ячейки в начале месяца
         for (let i = 0; i < offset; i++) {
-            daysContainer.innerHTML += `<div class="day empty-day"></div>`;
+            const empty = document.createElement("div");
+            empty.className = "day empty-day";
+            empty.innerText = "";
+            days.appendChild(empty);
         }
 
-        for (let d = 1; d <= monthLengths[m]; d++) {
+        // Рисуем дни месяца
+        for (let d = 1; d <= totalDays; d++) {
             const day = document.createElement("div");
             day.className = "day";
             day.innerText = d;
+
             day.dataset.day = d;
             day.dataset.month = m + 1;
 
-            if (holidays[m + 1]?.includes(d)) day.classList.add("holiday");
-            if (postdays[m + 1]?.includes(d)) day.classList.add("postday");
-            if ((m + 1) === currentMonth && d === currentDay) day.classList.add("today");
+            // Выделяем праздничные дни
+            if (holidays[m + 1]?.includes(d)) {
+                day.classList.add("holiday");
+            }
+
+            // Выделяем дни постов
+            if (postdays[m + 1]?.includes(d)) {
+                day.classList.add("postday");
+            }
+
+            // Выделяем сегодняшний день
+            if ((m + 1) === currentMonth && d === currentDay) {
+                day.classList.add("today");
+            }
 
             day.addEventListener("click", () => {
                 fetchDayInfo(d, m + 1);
             });
 
-            daysContainer.appendChild(day);
+            days.appendChild(day);
         }
 
+        monthDiv.appendChild(days);
         container.appendChild(monthDiv);
     }
 
-    if (yearOffset === 0) {
+    // После отрисовки календаря: прокрутить к сегодняшнему дню
+    if (yearOffset === 0) { // Только при первом открытии или возврате к текущему году
         const todayElement = document.querySelector(".today");
         if (todayElement) {
-            todayElement.scrollIntoView({ behavior: "smooth", block: "center" });
+            todayElement.scrollIntoView({
+                behavior: "smooth",
+                block: "center", // Центрируем по экрану
+            });
         }
     }
 }
@@ -160,21 +214,22 @@ function renderDayInfo(data, dayOfWeekIndex = null) {
     if (dayOfWeekIndex !== null) {
         extraNote = getSpecialNote(dayOfWeekIndex);
     } else if (data.dayName) {
-        const dayNameIndex = fullWeekNames.indexOf(data.dayName.trim());
+        const normalizedDayName = data.dayName.trim();
+        // Ищем индекс дня недели по названию
+        const dayNameIndex = fullWeekNames.indexOf(normalizedDayName);
         if (dayNameIndex !== -1) {
             extraNote = getSpecialNote(dayNameIndex);
         }
     }
 
     const info = `
-        <h3>Информация дня:</h3><br>
-        ${data.нoliday ? `<strong>Праздник:</strong> ${data.нoliday}<br>` : ""}
-        ${data.holiday ? `<strong>Праздник:</strong> ${data.holiday}<br>` : ""}
-        ${data.postName ? `<strong>${data.postName}</strong><br>` : ""}
-        ${data.postDescription ? `<em>${data.postDescription}</em><br>` : ""}
-        ${extraNote}
-    `;
-
+                <h3>Информация дня:</h3><br>
+                ${data.нoliday ? `<strong>Праздник:</strong> ${data.нoliday}<br>` : ""}
+                ${data.holiday ? `<strong>Праздник:</strong> ${data.holiday}<br>` : ""}
+                ${data.postName ? `<strong>${data.postName}</strong><br>` : ""}
+                ${data.postDescription ? `<em>${data.postDescription}</em><br>` : ""}
+                ${extraNote}
+            `;
     document.getElementById("result").innerHTML = info;
 }
 
@@ -185,12 +240,16 @@ async function fetchDayInfo(day, month) {
         const response = await fetch(url);
         const data = await response.json();
 
-        const monthLengths = Array.from({ length: 9 }, (_, i) => (currentYear16 === 16 ? 41 : (i + 1) % 2 === 0 ? 40 : 41));
+        // Вычисляем индекс дня недели
+        const monthLengths = [];
+        for (let i = 1; i <= 9; i++) {
+            const isEven = i % 2 === 0;
+            monthLengths.push((currentYear16 === 16) ? 41 : (isEven ? 40 : 41));
+        }
         const daysBefore = monthLengths.slice(0, month - 1).reduce((a, b) => a + b, 0) + day;
         const dayOfWeekIndex = (startWeekDayIndexGlobal + (daysBefore - 1)) % 9;
 
         renderDayInfo(data, dayOfWeekIndex);
-
         document.getElementById("result").scrollIntoView({ behavior: "smooth" });
     } catch (err) {
         document.getElementById("result").innerText = "Ошибка при загрузке информации о дне.";
@@ -219,7 +278,11 @@ document.getElementById("nextYear").addEventListener("click", () => {
 // Открытие и закрытие контактов разработчика
 document.getElementById("devName").addEventListener("click", () => {
     const contact = document.getElementById("contactInfo");
-    contact.style.display = (contact.style.display === "none") ? "block" : "none";
+    if (contact.style.display === "none") {
+        contact.style.display = "block";
+    } else {
+        contact.style.display = "none";
+    }
 });
 
 // Стартовая загрузка
