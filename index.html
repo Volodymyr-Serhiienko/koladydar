@@ -12,9 +12,10 @@
 
     <!-- Open Graph (для соцсетей) -->
     <meta property="og:title" content="Коляды Даръ — Древний Славяно-Арийский Календарь">
-    <meta property="og:description" content="Коляды Даръ — Древний Славяно-Арийский Календарь, на любое Лѣто. Праздники, посты и др.">
+    <meta property="og:description" content="Онлайн календарь на любое Лѣто. Праздники, посты и др.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://koladydar.vercel.app/">
+    <meta property="og:image" content="koladydar.jpg">
 
     <!-- Favicon -->
     <link rel="icon" href="favicon.ico" type="image/x-icon">
@@ -36,19 +37,24 @@
     <!-- Календарь -->
     <div class="calendar-grid" id="calendar"></div>
 
-    <!-- Блок для информации о дне -->
-    <div id="result"></div>
-
     <!-- Футер -->
     <footer class="footer">
         <p>
-            © Лѣто 7533 от СМЗХ. 
-            <span id="devName" class="developer">Связь с разработчиком сайта</span>
+            © Коляды Даръ. Лѣто 7533 от СМЗХ | 
+            <span id="devName" class="developer">Koнтакты</span>
         </p>
         <div id="contactInfo" class="contact-info" style="display: none;">
             <p>Сергієнко Владимѣръ. Email: <a href="mailto:utos.vovik@gmail.com">utos.vovik@gmail.com</a></p>
         </div>
     </footer>
+
+    <!-- Модальное окно -->
+    <div id="dayModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModal">&times;</span>
+            <div id="modalInfo"></div>
+        </div>
+    </div>
 
     <!-- Подключение JS -->
     <script src="script.js" defer></script>

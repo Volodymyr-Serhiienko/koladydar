@@ -1,5 +1,7 @@
 ﻿// ==================== Константы ====================
 
+const API_BASE_URL = "http://www.astroapi.somee.com";
+
 // Названия месяцев
 const monthNames = ["Рамхатъ", "Айлѣтъ", "Бейлѣтъ", "Гэйлѣтъ", "Дайлѣтъ", "Ѥлѣтъ", "Вейлѣтъ", "Хейлѣтъ", "Тайлѣтъ"];
 
@@ -44,7 +46,6 @@ const specialNotes = {
 
 // ==================== Переменные состояния ====================
 
-let isInitialLoad = true;     // Первая загрузка страницы
 let yearOffset = 0;           // Смещение года (для переключения лет)
 let startWeekDayIndexGlobal = 0; // Индекс начала недели
 let currentYear16 = 0;        // Номер года в 16-летнем цикле
@@ -71,23 +72,14 @@ async function loadCalendar(yearOverride = null) {
     }
 
     const encoded = encodeURIComponent(localDateTime);
-    const url = `/api/calender/numeroobjectslav?dateTime=${encoded}`;
+    const url = `${API_BASE_URL}/api/calender/numeroobjectslav?dateTime=${encoded}`;
 
     try {
         const response = await fetch(url);
         const data = await response.json();
 
         document.getElementById("title").innerText = `Лѣто ${data.year} от СМЗХ`;
-
         renderCalendar(data);
-
-        if (isInitialLoad || yearOffset === 0) {
-            renderDayInfo(data);
-        } else {
-            document.getElementById("result").innerHTML = "";
-        }
-
-        isInitialLoad = false;
     } catch (err) {
         document.getElementById("calendar").innerText = "Ошибка загрузки.";
         console.error(err);
@@ -195,20 +187,33 @@ function renderCalendar(todaySlav) {
         container.appendChild(monthDiv);
     }
 
-    // После отрисовки календаря: прокрутить к сегодняшнему дню
-    if (yearOffset === 0) { // Только при первом открытии или возврате к текущему году
+    // 🔄 Автопрокрутка в зависимости от года
+    if (yearOffset === 0) {
+        // Прокрутка к сегодняшнему дню
         const todayElement = document.querySelector(".today");
         if (todayElement) {
             todayElement.scrollIntoView({
                 behavior: "smooth",
-                block: "center", // Центрируем по экрану
+                block: "center",
+            });
+        }
+    } else {
+        // Прокрутка к началу календаря (но с учётом фиксированной верхней панели)
+        const calendarTop = document.querySelector(".calendar-grid");
+        if (calendarTop) {
+            const topOffset = calendarTop.getBoundingClientRect().top + window.scrollY;
+            const headerHeight = document.querySelector(".topbar")?.offsetHeight || 0;
+
+            window.scrollTo({
+                top: topOffset - headerHeight - 10, // небольшой зазор
+                behavior: "smooth"
             });
         }
     }
 }
 
 // Вывод информации о дне
-function renderDayInfo(data, dayOfWeekIndex = null) {
+function renderDayInfo(data, dayOfWeekIndex = null, day = null, month = null) {
     let extraNote = "";
 
     if (dayOfWeekIndex !== null) {
@@ -222,20 +227,23 @@ function renderDayInfo(data, dayOfWeekIndex = null) {
         }
     }
 
+    const monthName = month ? monthNames[month - 1] : "";
     const info = `
-                <h3>Информация дня:</h3><br>
-                ${data.нoliday ? `<strong>Праздник:</strong> ${data.нoliday}<br>` : ""}
+                <h3>Информация дня: ${day && monthName ? `${day} ${monthName}` : ""}</h3><br>
                 ${data.holiday ? `<strong>Праздник:</strong> ${data.holiday}<br>` : ""}
                 ${data.postName ? `<strong>${data.postName}</strong><br>` : ""}
                 ${data.postDescription ? `<em>${data.postDescription}</em><br>` : ""}
                 ${extraNote}
             `;
-    document.getElementById("result").innerHTML = info;
+
+    document.getElementById("modalInfo").innerHTML = info;
+    document.getElementById("dayModal").style.display = "flex";
 }
 
 // Загрузка информации о дне по клику
 async function fetchDayInfo(day, month) {
-    const url = `/api/calender/holidayobjectslav?day=${day}&month=${month}`;
+    const url = `${API_BASE_URL}/api/calender/holidayobjectslav?day=${day}&month=${month}`;
+
     try {
         const response = await fetch(url);
         const data = await response.json();
@@ -249,10 +257,9 @@ async function fetchDayInfo(day, month) {
         const daysBefore = monthLengths.slice(0, month - 1).reduce((a, b) => a + b, 0) + day;
         const dayOfWeekIndex = (startWeekDayIndexGlobal + (daysBefore - 1)) % 9;
 
-        renderDayInfo(data, dayOfWeekIndex);
-        document.getElementById("result").scrollIntoView({ behavior: "smooth" });
+        renderDayInfo(data, dayOfWeekIndex, day, month);
     } catch (err) {
-        document.getElementById("result").innerText = "Ошибка при загрузке информации о дне.";
+        document.getElementById("modalInfo").innerText = "Ошибка при загрузке информации о дне.";
         console.error(err);
     }
 }
@@ -282,6 +289,19 @@ document.getElementById("devName").addEventListener("click", () => {
         contact.style.display = "block";
     } else {
         contact.style.display = "none";
+    }
+});
+
+// Закрытие модального окна
+document.getElementById("closeModal").addEventListener("click", () => {
+    document.getElementById("dayModal").style.display = "none";
+});
+
+// Закрытие по клику вне окна
+window.addEventListener("click", (event) => {
+    const modal = document.getElementById("dayModal");
+    if (event.target === modal) {
+        modal.style.display = "none";
     }
 });
 

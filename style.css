@@ -140,17 +140,6 @@ h3 {
     border: 1px solid #e0c97f;
 }
 
-/* Блок информации о выбранном дне */
-#result {
-    margin-top: 10px;
-    font-size: 14px;
-    padding: 12px;
-    border-top: 1px solid #ccc;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
 /* Адаптивность для мобильных */
 @media (max-width: 600px) {
     .weekday, .day {
@@ -208,6 +197,44 @@ h3 {
     font-size: 14px;
 }
 
+/* Модальное окно */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    background-color: rgba(0, 0, 0, 0.5); /* полупрозрачный фон */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    max-width: 500px;
+    width: 90%;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.25);
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #888;
+}
+
+.close-btn:hover {
+    color: #000;
+}
+
+
 /* ====== Поддержка темной темы ====== */
 @media (prefers-color-scheme: dark) {
     body {
@@ -249,8 +276,31 @@ h3 {
         border-top: 1px solid #555;
     }
 
-    #result {
-        background-color: #1e1e1e;
-        border-top: 1px solid #555;
+    .modal-content {
+        background-color: #222;
+        color: #eee;
+        border: 1px solid #555;
     }
+
+        .modal-content h3,
+        .modal-content strong,
+        .modal-content em {
+            color: #eee;
+        }
+
+        .modal-content a {
+            color: #4fc3f7;
+        }
+
+            .modal-content a:hover {
+                color: #81d4fa;
+            }
+
+    .close-button {
+        color: #ccc;
+    }
+
+        .close-button:hover {
+            color: #fff;
+        }
 }
