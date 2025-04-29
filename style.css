@@ -166,6 +166,7 @@ h3 {
         padding: 5px 10px;
         user-select: none;
         transition: transform 0.2s ease;
+        color: #000000;
     }
 
         /* Эффект наведения на кнопки стрелок */
@@ -239,6 +240,10 @@ h3 {
 @media (prefers-color-scheme: dark) {
     body {
         background-color: #121212;
+        color: #ffffff;
+    }
+
+    .header button {
         color: #ffffff;
     }
 
