@@ -9,7 +9,7 @@
     <meta name="description" content="Коляды Даръ — Древний Славяно-Арийский Календарь, на любое Лѣто. Праздники, посты и др.">
     <meta name="keywords" content="Коляды Дар,Коляды Даръ,древний,арии, каляды, славянский,арийский, славяно-арийский, календарь, славяне, ингляне, инглинги, жреческий, звездный, праздники, славянские, посты, культура, лето, лѣто">
     <meta name="author" content="Volodymyr Serhiienko">
-    
+
     <!-- Open Graph (для соцсетей) -->
     <meta property="og:title" content="Коляды Даръ — Древний Славяно-Арийский Календарь">
     <meta property="og:description" content="Онлайн календарь на любое Лѣто. Праздники, посты и др.">
@@ -22,6 +22,9 @@
 
     <!-- Подключение CSS -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- Подключение JS -->
+    <script src="script.js" defer></script>
 </head>
 <body>
     <!-- Закрепленная верхняя панель -->
@@ -38,9 +41,9 @@
     <div class="calendar-grid" id="calendar"></div>
 
     <!-- Футер -->
-    <footer class="footer">
+    <footer id="footer" class="footer hidden">
         <p>
-            © Коляды Даръ. Лѣто 7533 от СМЗХ | 
+            © Коляды Даръ. Лѣто 7533 от СМЗХ |
             <span id="devName" class="developer">Koнтакты</span>
         </p>
         <div id="contactInfo" class="contact-info" style="display: none;">
@@ -55,8 +58,5 @@
             <div id="modalInfo"></div>
         </div>
     </div>
-
-    <!-- Подключение JS -->
-    <script src="script.js" defer></script>
 </body>
 </html>

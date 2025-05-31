@@ -184,6 +184,10 @@ h3 {
     font-size: 14px;
 }
 
+.hidden {
+    display: none;
+}
+
 /* Ссылка на разработчика */
 .developer {
     color: #0077cc;

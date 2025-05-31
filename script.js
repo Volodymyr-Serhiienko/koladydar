@@ -1,6 +1,6 @@
 ﻿// ==================== Константы ====================
 
-const API_BASE_URL = "";
+const API_BASE_URL = "http://www.astroapi.somee.com";
 
 // Названия месяцев
 const monthNames = ["Рамхатъ", "Айлѣтъ", "Бейлѣтъ", "Гэйлѣтъ", "Дайлѣтъ", "Ѥлѣтъ", "Вейлѣтъ", "Хейлѣтъ", "Тайлѣтъ"];
@@ -70,19 +70,19 @@ async function loadCalendar(yearOverride = null) {
         // Заглушка: фиксированная дата для указанного года
         localDateTime = `${yearOverride}-07-01T12:00:00`;
     }
-
+    
     const encoded = encodeURIComponent(localDateTime);
     const url = `${API_BASE_URL}/api/calender/numeroobjectslav?dateTime=${encoded}`;
 
     try {
         const response = await fetch(url);
         const data = await response.json();
-
         document.getElementById("title").innerText = `Лѣто ${data.year} от СМЗХ`;
         renderCalendar(data);
     } catch (err) {
-        document.getElementById("calendar").innerText = "Ошибка загрузки.";
-        console.error(err);
+        document.getElementById("calendar").innerText = "Ошибка загрузки." + err;
+    } finally {
+        document.getElementById("footer").classList.remove("hidden");
     }
 }
 
@@ -259,8 +259,7 @@ async function fetchDayInfo(day, month) {
 
         renderDayInfo(data, dayOfWeekIndex, day, month);
     } catch (err) {
-        document.getElementById("modalInfo").innerText = "Ошибка при загрузке информации о дне.";
-        console.error(err);
+        document.getElementById("modalInfo").innerText = "Ошибка при загрузке информации о дне." + err;
     }
 }
 
@@ -306,4 +305,5 @@ window.addEventListener("click", (event) => {
 });
 
 // Стартовая загрузка
+
 loadCalendar();
